@@ -5,6 +5,9 @@ version = '1.0'
 
 repositories {
     mavenCentral()
+    maven {
+        url "http://maven.restlet.org"
+    }
 }
 
 dependencies {
