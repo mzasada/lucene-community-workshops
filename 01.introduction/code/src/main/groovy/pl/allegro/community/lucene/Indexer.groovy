@@ -18,9 +18,13 @@ class Indexer implements Closeable {
         this.indexWriter = new IndexWriter(directory, indexWriterConfig)
     }
 
-    int index(Map<String, Object> fields) {
+    void index(Map<String, Object> fields) {
         def document = prepareDocument(fields)
         indexWriter.addDocument(document)
+        indexWriter.commit()
+    }
+
+    int countIndexedDocuments() {
         indexWriter.numDocs()
     }
 
