@@ -5,3 +5,6 @@ build
 ## IntelliJ Idea
 *.iml
 .idea
+
+## Grunt
+node_modules
