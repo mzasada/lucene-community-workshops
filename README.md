@@ -1,9 +1,11 @@
 lucene-community-workshops
 ==========================
 
-01. Introduction
+### 01. Introduction
 
-How to run slides:
-# Change to the 01.introduction/slides directory.
-# Install project dependencies with *npm install*.
-# Run Grunt with *grunt www*.
+Summary: TBA
+
+How to run the slides:
++ Change to the <code>01.introduction/slides</code> directory.
++ Install project dependencies with <code>npm install</code>.
++ Run Grunt with <code>grunt www</code>.
