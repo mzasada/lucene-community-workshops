@@ -1,0 +1,11 @@
+{
+  "name": "lucene-community-workshops-01",
+  "version": "0.0.1",
+  "devDependencies": {
+    "grunt": "~0.4.2",
+    "grunt-contrib-jshint": "~0.7.0",
+    "grunt-contrib-connect": "~0.5.0",
+    "grunt-html2js": "~0.2.3",
+    "string": "~1.7.0"
+  }
+}
