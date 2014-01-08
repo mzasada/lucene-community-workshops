@@ -296,6 +296,345 @@ public abstract class QParserPlugin
     ...
 </code></pre>
         </section>
+        <section>
+        <section>
+            <h1>schema.xml file</h1>
+            <ul>
+                <li>what fields are possible for document
+                <li>what fields types can be used
+                <li>how to index and search each field
+            </ul>
+        </section>
+        <section>
+ <pre><code data-trim>
+     &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; ?&gt;
+     &lt;schema name=&quot;example&quot; version=&quot;1.5&quot;&gt;
+     &lt;types&gt;
+     &lt;fieldType name=&quot;string&quot; class=&quot;solr.StrField&quot; sortMissingLast=&quot;true&quot; /&gt;
+     &lt;/types&gt;
+     &lt;fields&gt;
+     &lt;field name=&quot;name&quot; type=&quot;text&quot; indexed=&quot;true&quot; stored=&quot;true&quot;/&gt;
+     &lt;dynamicField name=&quot;*_i&quot;  type=&quot;int&quot;    indexed=&quot;true&quot;  stored=&quot;true&quot;/&gt;
+     &lt;/fields&gt;
+     &lt;uniqueKey&gt;id&lt;/uniqueKey&gt;
+     &lt;copyField source=&quot;name&quot; dest=&quot;text&quot;/&gt;
+     &lt;similarity class=&quot;com.example.solr.CustomSimilarityFactory&quot;/&gt;
+ </code></pre>
+            </p>
+        </section>
+        <section>
+            <h1>fieldtype</h1>
+            <h5>org.apache.lucene.document.FieldType subclass</h5>
+            <h5>Must contain:</h5>
+            <ul>
+                <li>name
+                <li>class
+            </ul>
+ <pre><code data-trim>
+     &lt;fieldType name=&quot;boolean&quot; class=&quot;solr.BoolField&quot; sortMissingLast=&quot;true&quot;/&gt;
+ </code></pre>
+        </section>
+        <section>
+            <h1>fieldtype</h1>
+            <h5>optional attributes</h5>
+            <ul>
+                <li>indexed
+                <li>stored
+                <li>sortMissingLast, sortMissingFirst
+                <li>multiValued
+                <li>omitTermFreqAndPositions
+                <li>omitPositions
+                <li>positionIncrementGap
+                <li>autoGeneratePhraseQueries
+            </ul>
+        </section>
+        <section>
+                <pre><code data-trim>
+                    &lt;field name=&quot;name&quot; type=&quot;text&quot; /&gt;
+                </code></pre>
+            <ul>
+                <li>useful text field
+                <li>enable splitting and matching with WordDelimiterFilter
+                <li>synonims, stopwords configured by config file
+                <li>stemming
+            </ul>
+        </section>
+        <section>
+                <pre><code data-trim>
+                    &lt;field name=&quot;name&quot; type=&quot;string&quot; /&gt;
+                </code></pre>
+            <ul>
+                <li>defined in rg.apache.solr.schema.StrField
+                <li>not analized
+            </ul>
+        </section>
+        <section>
+ <pre><code data-trim>
+     &lt;fieldType name=&quot;text_general&quot; class=&quot;solr.TextField&quot; positionIncrementGap=&quot;100&quot;&gt;
+     &lt;analyzer type=&quot;index&quot;&gt;
+     &lt;tokenizer class=&quot;solr.StandardTokenizerFactory&quot;/&gt;
+     &lt;filter class=&quot;solr.StopFilterFactory&quot; ignoreCase=&quot;true&quot; words=&quot;stopwords.txt&quot; /&gt;
+     &lt;!-- in this example, we will only use synonyms at query time
+     &lt;filter class=&quot;solr.SynonymFilterFactory&quot; synonyms=&quot;index_synonyms.txt&quot; ignoreCase=&quot;true&quot; expand=&quot;false&quot;/&gt;
+     --&gt;
+     &lt;filter class=&quot;solr.LowerCaseFilterFactory&quot;/&gt;
+     &lt;/analyzer&gt;
+     &lt;analyzer type=&quot;query&quot;&gt;
+     &lt;tokenizer class=&quot;solr.StandardTokenizerFactory&quot;/&gt;
+     &lt;filter class=&quot;solr.StopFilterFactory&quot; ignoreCase=&quot;true&quot; words=&quot;stopwords.txt&quot; /&gt;
+     &lt;filter class=&quot;solr.SynonymFilterFactory&quot; synonyms=&quot;synonyms.txt&quot; ignoreCase=&quot;true&quot; expand=&quot;true&quot;/&gt;
+     &lt;filter class=&quot;solr.LowerCaseFilterFactory&quot;/&gt;
+     &lt;/analyzer&gt;
+     &lt;/fieldType&gt;
+ </code></pre>
+        </section>
+        <section>
+            <h1>fields</h1>
+            <h5>All fields to be used must be defined
+                <h5>Standard fields</h5>
+                <ul>
+                    <li>id
+                    <li>_version_ - optimistic locking solr 4.0
+                </ul>
+        </section>
+        <section>
+            <h1>field</h1>
+            <h5>Requred attributes</h5>
+            <ul>
+                <li>name
+                <li>type (defined in the types section) or class
+            </ul>
+        </section>
+        <section>
+            <h1>field</h1>
+            <h5>optional attributes (any type attributes can be overriden)</h5>
+            <ul>
+                <li>default
+                <li>indexed - required for searching, sorting, facets
+                <li>stored - required for highlighting, more like this
+                <li>compressed
+                <li>multivalued
+                <li>termVectors - improve highlighting performance,
+                <li>termOffsets - improve highlighting performance, more like this, document fequency
+            </ul>
+        </section>
+        <section>
+            <h1>dynamicField</h1>
+            <ul>
+                <li>defined by pattern with *
+                <li>must be prefixed ot suffixed by *
+                <li>the longest pattern will win, if equal then first defined in schema.xml
+            </ul>
+<pre><code data-trim>
+    &lt;dynamicField name=&quot;*_i&quot;  type=&quot;integer&quot;  indexed=&quot;true&quot;  stored=&quot;true&quot;/&gt;
+</code></pre>
+        </section>
+        <section>
+            <h1>uniqueKey</h1>
+            <ul>
+                <li>unique field in the index - an identifier of the document
+                <li>adding new document with existing value will remove old one
+            </ul>
+ <pre><code data-trim>
+     &lt;uniqueKey&gt;id&lt;/uniqueKey&gt;
+ </code></pre>
+        </section>
+        <section>
+            <h1>copyField</h1>
+            <ul>
+                <li>During indexing we can put data into other fields
+                <li>Used for creating textual search where sources are in many fields
+                <li>For faceting - when no analize should be done
+            </ul>
+ <pre><code data-trim>
+     &lt;copyField source=&quot;body&quot; dest=&quot;teaser&quot; maxChars=&quot;300&quot;/&gt;
+     &lt;copyField source=&quot;*&quot; dest=&quot;text&quot;/&gt;
+ </code></pre>
+        </section>
+        <section>
+            <h1>similiaryty</h1>
+            <ul>
+                <li>Can be defined per field definition, and globally for index
+            </ul>
+ <pre><code data-trim>
+     &lt;similarity class=&quot;solr.DFRSimilarityFactory&quot;&gt;
+     &lt;str name=&quot;basicModel&quot;&gt;P&lt;/str&gt;
+     &lt;str name=&quot;afterEffect&quot;&gt;L&lt;/str&gt;
+     &lt;str name=&quot;normalization&quot;&gt;H2&lt;/str&gt;
+     &lt;float name=&quot;c&quot;&gt;7&lt;/float&gt;
+     &lt;/similarity&gt;
+ </code></pre>
+        </section>
+        <section>
+            <h1>poly fields</h1>
+            <ul>
+                <li>One field can contains subfields
+                <li>PointType
+                <li>CurrencyField
+                <li>for currency we can give own ExchangeRateProvider
+            </ul>
+ <pre><code data-trim>
+     &lt;fieldType name=&quot;currency&quot; type=&quot;currency&quot;
+     currencyConfig=&quot;currency.xml&quot; defaultCurrency=&quot;PLN&quot; /&gt;
+ </code></pre>
+        </section>
+        <section>
+            <h1>Schema version</h1>
+ <pre><code data-trim>
+     &lt;schema name=&quot;example&quot; version=&quot;1.5&quot;&gt;
+     &lt;!-- attribute &quot;name&quot; is the name of this schema and is only used for display purposes.
+     version=&quot;x.y&quot; is Solr&#039;s version number for the schema syntax and
+     semantics.  It should not normally be changed by applications.
+
+     1.0: multiValued attribute did not exist, all fields are multiValued
+     by nature
+     1.1: multiValued attribute introduced, false by default
+     1.2: omitTermFreqAndPositions attribute introduced, true by default
+     except for text fields.
+     1.3: removed optional field compress feature
+     1.4: autoGeneratePhraseQueries attribute introduced to drive QueryParser
+     behavior when a single string produces multiple tokens.  Defaults
+     to off for version &gt;= 1.4
+     1.5: omitNorms defaults to true for primitive field types
+     (int, float, boolean, string...)
+     --&gt;
+ </code></pre>
+        </section>
+        <section>
+            <h1>Example 1</h1>
+             <pre><code data-trim>
+                 &lt;types&gt;
+                 &lt;fieldType name=&quot;string&quot; class=&quot;solr.StrField&quot; sortMissingLast=&quot;true&quot; /&gt;
+
+                 &lt;fieldType name=&quot;integer&quot; class=&quot;solr.TrieIntField&quot; sortMissingLast=&quot;true&quot; /&gt;
+             </code></pre>
+        </section>
+        <section>
+            <h1>Example 1 c.d.</h1>
+             <pre><code data-trim>
+                 &lt;fieldType name=&quot;date&quot; class=&quot;solr.TrieDateField&quot; precisionStep=&quot;0&quot; positionIncrementGap=&quot;0&quot;/&gt;
+                 &lt;fieldType name=&quot;keyword&quot; class=&quot;solr.TextField&quot; sortMissingLast=&quot;true&quot;&gt;
+                 &lt;analyzer&gt;
+                 &lt;tokenizer class=&quot;solr.KeywordTokenizerFactory&quot; /&gt;
+                 &lt;filter class=&quot;solr.LowerCaseFilterFactory&quot; /&gt;
+                 &lt;/analyzer&gt;
+                 &lt;/fieldType&gt;
+                 &lt;fieldType name=&quot;url_email&quot; class=&quot;solr.TextField&quot;&gt;
+                 &lt;analyzer type=&quot;index&quot;&gt;
+                 &lt;tokenizer class=&quot;solr.UAX29URLEmailTokenizerFactory&quot; /&gt;
+                 &lt;filter class=&quot;solr.WordDelimiterFilterFactory&quot; generateWordParts=&quot;1&quot; generateNumberParts=&quot;1&quot; catenateWords=&quot;0&quot;
+                 catenateNumbers=&quot;0&quot; catenateAll=&quot;0&quot; preserveOriginal=&quot;1&quot; /&gt;
+                 &lt;filter class=&quot;solr.LowerCaseFilterFactory&quot; /&gt;
+                 &lt;/analyzer&gt;
+                 &lt;analyzer type=&quot;query&quot;&gt;
+                 &lt;tokenizer class=&quot;solr.UAX29URLEmailTokenizerFactory&quot; /&gt;
+                 &lt;filter class=&quot;solr.LowerCaseFilterFactory&quot; /&gt;
+                 &lt;/analyzer&gt;
+                 &lt;/fieldType&gt;
+                 &lt;/types&gt;
+             </code></pre>
+        </section>
+        <section>
+            <h1>Example 1 c.d.</h1>
+             <pre><code data-trim>
+                 &lt;fields&gt;
+                 &lt;field name=&quot;id&quot; type=&quot;string&quot; indexed=&quot;true&quot; stored=&quot;true&quot; required=&quot;true&quot; /&gt;
+                 &lt;field name=&quot;poolName&quot; type=&quot;keyword&quot; indexed=&quot;true&quot; stored=&quot;true&quot; required=&quot;true&quot; /&gt;
+                 &lt;field name=&quot;code&quot; type=&quot;keyword&quot; indexed=&quot;true&quot; stored=&quot;false&quot; required=&quot;false&quot; /&gt;
+                 &lt;field name=&quot;amount&quot; type=&quot;integer&quot; indexed=&quot;false&quot; stored=&quot;true&quot; required=&quot;false&quot; /&gt;
+                 &lt;field name=&quot;email&quot; type=&quot;url_email&quot; indexed=&quot;true&quot; stored=&quot;true&quot; required=&quot;false&quot; /&gt;
+                 &lt;field name=&quot;orderCreationDate&quot; type=&quot;date&quot; indexed=&quot;true&quot; stored=&quot;true&quot; required=&quot;false&quot; /&gt;
+                 &lt;/fields&gt;
+
+                 &lt;uniqueKey&gt;id&lt;/uniqueKey&gt;
+
+                 &lt;solrQueryParser defaultOperator=&quot;AND&quot; /&gt;
+             </code></pre>
+        </section>
+
+        <section>
+            <h1>Example 2</h1>
+             <pre><code data-trim>
+                 &lt;types&gt;
+                 &lt;fieldType name=&quot;string&quot; class=&quot;solr.StrField&quot; sortMissingLast=&quot;true&quot; /&gt;
+                 &lt;fieldType name=&quot;boolean&quot; class=&quot;solr.BoolField&quot; sortMissingLast=&quot;true&quot; /&gt;
+                 &lt;fieldtype name=&quot;binary&quot; class=&quot;solr.BinaryField&quot; /&gt;
+                 &lt;fieldType name=&quot;int&quot; class=&quot;solr.TrieIntField&quot; precisionStep=&quot;0&quot; positionIncrementGap=&quot;0&quot; /&gt;
+                 &lt;fieldType name=&quot;float&quot; class=&quot;solr.TrieFloatField&quot; precisionStep=&quot;8&quot; positionIncrementGap=&quot;0&quot;
+                 sortMissingLast=&quot;true&quot; /&gt;
+                 &lt;fieldType name=&quot;float_facet&quot; class=&quot;solr.TrieFloatField&quot; precisionStep=&quot;8&quot; positionIncrementGap=&quot;0&quot; /&gt;
+                 &lt;fieldType name=&quot;long&quot; class=&quot;solr.TrieLongField&quot; precisionStep=&quot;0&quot; positionIncrementGap=&quot;0&quot; /&gt;
+                 &lt;fieldType name=&quot;double&quot; class=&quot;solr.TrieDoubleField&quot; precisionStep=&quot;0&quot; positionIncrementGap=&quot;0&quot; /&gt;
+             </code></pre>
+        </section>
+
+        <section>
+            <h1>Example 2 c.d.</h1>
+             <pre><code data-trim>
+                 &lt;fieldType name=&quot;date&quot; class=&quot;solr.TrieDateField&quot; precisionStep=&quot;0&quot; positionIncrementGap=&quot;0&quot;
+                 sortMissingLast=&quot;true&quot; /&gt;
+                 &lt;fieldType name=&quot;date_facet&quot; class=&quot;solr.TrieDateField&quot; precisionStep=&quot;6&quot; positionIncrementGap=&quot;0&quot; /&gt;
+                 &lt;fieldType name=&quot;currency&quot; class=&quot;solr.CurrencyField&quot; precisionStep=&quot;8&quot; defaultCurrency=&quot;PLN&quot;
+                 currencyConfig=&quot;currency.xml&quot; /&gt;
+                 &lt;fieldType name=&quot;text_ws&quot; class=&quot;solr.TextField&quot; positionIncrementGap=&quot;100&quot;&gt;
+                 &lt;analyzer&gt;
+                 &lt;tokenizer class=&quot;solr.WhitespaceTokenizerFactory&quot; /&gt;
+                 &lt;/analyzer&gt;
+                 &lt;/fieldType&gt;
+             </code></pre>
+        </section>
+        <section>
+            <h1>Example 2 c.d.</h1>
+             <pre><code data-trim>
+                 &lt;fieldType name=&quot;text&quot; class=&quot;solr.TextField&quot; positionIncrementGap=&quot;100&quot;&gt;
+                 &lt;analyzer type=&quot;index&quot;&gt;
+                 &lt;tokenizer class=&quot;solr.StandardTokenizerFactory&quot; /&gt;
+                 &lt;filter class=&quot;solr.LowerCaseFilterFactory&quot; /&gt;
+                 &lt;filter class=&quot;solr.StopFilterFactory&quot; ignoreCase=&quot;true&quot; words=&quot;stopwords.txt&quot;
+                 enablePositionIncrements=&quot;true&quot; /&gt;
+                 &lt;filter class=&quot;solr.HunspellStemFilterFactory&quot; dictionary=&quot;pl_PL.dic&quot; affix=&quot;pl_PL.aff&quot; ignoreCase=&quot;true&quot; /&gt;
+                 &lt;/analyzer&gt;
+                 &lt;analyzer type=&quot;query&quot;&gt;
+                 &lt;tokenizer class=&quot;solr.StandardTokenizerFactory&quot; /&gt;
+                 &lt;filter class=&quot;solr.LowerCaseFilterFactory&quot; /&gt;
+                 &lt;/analyzer&gt;
+                 &lt;/fieldType&gt;
+                 &lt;fieldType name=&quot;text_facet&quot; class=&quot;solr.TextField&quot; sortMissingLast=&quot;true&quot; omitNorms=&quot;true&quot; /&gt;
+                 &lt;/types&gt;
+             </code></pre>
+        </section>
+        <section>
+            <h1>Example 2 c.d.</h1>
+             <pre><code data-trim>
+                 &lt;fields&gt;
+                 &lt;field name=&quot;id&quot; type=&quot;string&quot; indexed=&quot;true&quot; stored=&quot;true&quot; required=&quot;true&quot; /&gt;
+                 &lt;field name=&quot;text&quot; type=&quot;text&quot; indexed=&quot;true&quot; stored=&quot;false&quot; multiValued=&quot;true&quot; /&gt;
+
+                 &lt;dynamicField name=&quot;*_txt&quot; type=&quot;text&quot; indexed=&quot;true&quot; stored=&quot;true&quot; multiValued=&quot;true&quot; /&gt;
+                 &lt;dynamicField name=&quot;*_tf&quot; type=&quot;float&quot; indexed=&quot;true&quot; stored=&quot;true&quot; /&gt;
+                 &lt;dynamicField name=&quot;*_dt&quot; type=&quot;date&quot; indexed=&quot;true&quot; stored=&quot;true&quot; /&gt;
+                 &lt;dynamicField name=&quot;*_b&quot; type=&quot;boolean&quot; indexed=&quot;true&quot; stored=&quot;true&quot; /&gt;
+                 &lt;dynamicField name=&quot;*_ct&quot; type=&quot;text_ws&quot; indexed=&quot;true&quot; stored=&quot;true&quot; multiValued=&quot;true&quot; /&gt;
+
+                 &lt;dynamicField name=&quot;*_txt_facet&quot; type=&quot;text_facet&quot; indexed=&quot;true&quot; stored=&quot;true&quot; multiValued=&quot;true&quot; /&gt;
+                 &lt;dynamicField name=&quot;*_dt_facet&quot; type=&quot;date_facet&quot; indexed=&quot;true&quot; stored=&quot;true&quot; /&gt;
+                 &lt;dynamicField name=&quot;*_tf_facet&quot; type=&quot;float_facet&quot; indexed=&quot;true&quot; stored=&quot;true&quot; /&gt;
+                 &lt;dynamicField name=&quot;*_ct_facet&quot; type=&quot;text_ws&quot; indexed=&quot;true&quot; stored=&quot;true&quot; multiValued=&quot;true&quot; /&gt;
+             </code></pre>
+        </section>
+        <section>
+            <h1>Example 2 c.d.</h1>
+             <pre><code data-trim>
+                 &lt;dynamicField name=&quot;categoryLevel*&quot; type=&quot;text_ws&quot; indexed=&quot;true&quot; stored=&quot;true&quot; multiValued=&quot;true&quot; /&gt;
+                 &lt;/fields&gt;
+
+                 &lt;uniqueKey&gt;id&lt;/uniqueKey&gt;
+
+                 &lt;solrQueryParser defaultOperator=&quot;AND&quot; /&gt;
+             </code></pre>
+        </section>
+        </section>
+
 
         <section>
             <h1>Q & A</h1>
