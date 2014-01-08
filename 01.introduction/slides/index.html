@@ -308,21 +308,64 @@
         </section>
 
         <section>
-            <h2>Solr searching</h2>
-            <h4>Query parsing</h4>
+
+            <section>
+                <h2>Solr searching</h2>
+                <h4>Request processing</h4>
+                <img src="img/solr/searching/SearchComponent.svg" alt="Search request procesing"/>
+            </section>
+
+            <section>
+                <h2>Solr searching</h2>
+                <h4>solrconfig.xml</h4>
+<pre><code data-trim>
+    &lt;searchComponent name="nameOfCustomComponent" class="my.app.MyQueryComponent"/&gt;
+</code></pre>
+<pre><code data-trim>
+&lt;requestHandler name="/select" class="solr.SearchHandler"&gt;
+    &lt;arr name="components"&gt;
+        &lt;str&gt;nameOfCustomComponent&lt;/str&gt;
+    &lt;/arr&gt;
+&lt;/requestHandler&gt;
+</code></pre>
+            </section>
+
+            <section>
+                <h2>Solr searching</h2>
+                <h4>solrconfig.xml</h4>
 <pre><code data-trim>
 public abstract class QParserPlugin
     implements NamedListInitializedPlugin, SolrInfoMBean {
 
-    /** internal use - name of the default parser */
-    public static String DEFAULT_QTYPE = LuceneQParserPlugin.NAME;
-
-    /** internal use - name to class mappings of builtin parsers */
     public static final Object[] standardPlugins = {
-        LuceneQParserPlugin.NAME, LuceneQParserPlugin.class,
-        ExtendedDismaxQParserPlugin.NAME, ExtendedDismaxQParserPlugin.class,
+        "lucene", LuceneQParserPlugin.class,
+        "edismax", ExtendedDismaxQParserPlugin.class,
     ...
 </code></pre>
+<pre><code data-trim>
+&lt;requestHandler name="/select" class="solr.SearchHandler"&gt;
+    &lt;lst name="defaults"&gt;
+        &lt;str name="defType"&gt;edismax&lt;/str&gt;
+    &lt;/lst&gt;
+&lt;/requestHandler&gt;
+</code></pre>
+            </section>
+
+            <section>
+                <h2>Solr searching</h2>
+                <h4>solrconfig.xml</h4>
+<pre><code data-trim>
+    &lt;queryParser name="myparser" class="com.mycompany.MyQParserPlugin"/&gt;
+</code></pre>
+<pre><code data-trim>
+&lt;requestHandler name="/select" class="solr.SearchHandler"&gt;
+    &lt;lst name="defaults"&gt;
+        &lt;str name="defType"&gt;myparser&lt;/str&gt;
+    &lt;/lst&gt;
+&lt;/requestHandler&gt;
+</code></pre>
+            </section>
+
         </section>
 
         <section>
@@ -353,7 +396,6 @@ public abstract class QParserPlugin
      &lt;copyField source=&quot;name&quot; dest=&quot;text&quot;/&gt;
      &lt;similarity class=&quot;com.example.solr.CustomSimilarityFactory&quot;/&gt;
  </code></pre>
-            </p>
         </section>
         <section>
             <h1>fieldtype</h1>
@@ -423,7 +465,7 @@ public abstract class QParserPlugin
         </section>
         <section>
             <h1>fields</h1>
-            <h5>All fields to be used must be defined
+            <h5>All fields to be used must be defined</h5>
                 <h5>Standard fields</h5>
                 <ul>
                     <li>id
