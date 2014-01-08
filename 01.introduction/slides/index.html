@@ -48,7 +48,7 @@
         <section>
             <h2>Indexing</h2>
             <h4>Classes used when indexing documents with Lucene</h4>
-            <img src="img/lucene-indexing.svg" alt="Lucene indexing"/>
+            <img src="img/lucene/indexing/lucene-indexing.svg" alt="Lucene indexing"/>
         </section>
 
         <section>
@@ -105,7 +105,57 @@
 
         </section>
 
-        <!-- Solr Indexing -->
+        <!-- Lucene searching -->
+
+        <section>
+            <h2>Searching</h2>
+            <h4>Classes used when searching for documents with Lucene</h4>
+            <img src="img/lucene/searching/lucene-searching.svg" alt="Lucene searching"/>
+        </section>
+
+        <section>
+            <section>
+                <h2>Lucene searching</h2>
+                <h4>Searching API</h4>
+<pre><code data-trim>
+    class Searcher {
+
+    IndexSearcher indexSearcher
+
+    QueryParser queryParser
+
+    Searcher(File fileLocation) {
+        def directory = FSDirectory.open(fileLocation)
+        indexSearcher = new IndexSearcher(DirectoryReader.open(directory))
+        queryParser = new QueryParser(
+            Version.LUCENE_46,
+            SchemaConstants.FIELD_NAME_CONTENT,
+            new StandardAnalyzer(Version.LUCENE_46))
+    }
+
+    (...)
+</code></pre>
+            </section>
+
+            <section>
+                <h2>Lucene searching</h2>
+                <h4>Query processing</h4>
+<pre><code data-trim>
+    List&lt;Document&gt; search(String phrase) {
+        Query query = queryParser.parse(phrase)
+        def start = currentTimeMillis()
+        TopDocs hits = indexSearcher.search(query, 10)
+        def duration = currentTimeMillis() - start
+        println("Found $hits.totalHits document(s) in $duration ms for query $phrase")
+
+        hits.scoreDocs.collect { indexSearcher.doc(it.doc) }
+    }
+</code></pre>
+            </section>
+
+        </section>
+
+        <!-- Solr request handling -->
 
         <section>
             <section>
@@ -153,6 +203,8 @@
 </code></pre>
             </section>
         </section>
+
+        <!-- Solr indexing -->
 
         <section>
             <h2>Solr indexing</h2>
@@ -223,6 +275,13 @@
         class="${solr.directoryFactory:solr.StandardDirectoryFactory}"/&gt;
 </code></pre>
             </section>
+        </section>
+
+        <!-- Solr searching -->
+
+        <section>
+            <h2>Solr searching</h2>
+            <h4>Query parsing</h4>
         </section>
 
         <section>
