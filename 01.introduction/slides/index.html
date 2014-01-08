@@ -282,6 +282,19 @@
         <section>
             <h2>Solr searching</h2>
             <h4>Query parsing</h4>
+<pre><code data-trim>
+public abstract class QParserPlugin
+    implements NamedListInitializedPlugin, SolrInfoMBean {
+
+    /** internal use - name of the default parser */
+    public static String DEFAULT_QTYPE = LuceneQParserPlugin.NAME;
+
+    /** internal use - name to class mappings of builtin parsers */
+    public static final Object[] standardPlugins = {
+        LuceneQParserPlugin.NAME, LuceneQParserPlugin.class,
+        ExtendedDismaxQParserPlugin.NAME, ExtendedDismaxQParserPlugin.class,
+    ...
+</code></pre>
         </section>
 
         <section>
