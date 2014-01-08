@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="css/theme/night.css" id="theme">
 
     <!-- For syntax highlighting -->
-    <!--<link rel="stylesheet" href="lib/css/zenburn.css">-->
+    <link rel="stylesheet" href="css/zenburn.css">
 </head>
 
 <body>
@@ -34,17 +34,75 @@
         <section>
             <h1>Agenda</h1>
             <ul>
-                <li>1st</li>
-                <li>2nd</li>
-                <li>3rd</li>
+                <li>Indexing</li>
+                <li>Searching</li>
+                <li>Q & A</li>
             </ul>
         </section>
 
+        <section>
+            <h2>Indexing</h2>
+            <h4>Classes used when indexing documents with Lucene</h4>
+            <img src="img/lucene-indexing.svg" alt="Lucene indexing"/>
         </section>
 
         <section>
-            <h1>Q & A</h1>
+            <section>
+                <h2>Indexing</h2>
+                <h4>Lucene indexing API</h4>
+<pre><code data-trim>
+    class Indexer implements Closeable {
+
+        IndexWriter indexWriter
+
+        Indexer(File indexLocation) {
+            def directory = FSDirectory.open(indexLocation)
+            def indexWriterConfig = new IndexWriterConfig(
+                Version.LUCENE_46,
+                new StandardAnalyzer(Version.LUCENE_46))
+            this.indexWriter = new IndexWriter(directory, indexWriterConfig)
+        }
+
+        (...)
+</code></pre>
+            </section>
+
+            <section>
+                <h2>Indexing</h2>
+                <h4>Document preparation</h4>
+<pre><code data-trim>
+    private Document prepareDocument(Map&lt;String, Object&gt; fields) {
+        new Document().with {
+            fields.each {
+                key, value -&gt; add(new Field(key, value, TextField.TYPE_STORED))
+            }
+            it
+        }
+    }
+
+    (...)
+</code></pre>
+            </section>
+
+            <section>
+                <h2>Indexing</h2>
+                <h4>Adding document into index</h4>
+<pre><code data-trim>
+    void index(Map&lt;String, Object&gt; fields) {
+        def document = prepareDocument(fields)
+        indexWriter.addDocument(document)
+        indexWriter.commit()
+    }
+
+    (...)
+</code></pre>
+            </section>
+
         </section>
+
+            <section>
+                <h1>Q & A</h1>
+            </section>
 
     </div>
 </div>
@@ -70,9 +128,12 @@
 
         dependencies: [
             // Syntax highlight for <code> elements
-            { src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
+            { src: 'js/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
         ]
     });
+
+
+
 
 
 </script>
