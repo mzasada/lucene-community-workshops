@@ -210,7 +210,18 @@
             </section>
 
             <section>
-
+                <h2>Solr indexing</h2>
+                <h4>solrconfig.xml</h4>
+<pre><code data-trim>
+    &lt;luceneMatchVersion&gt;LUCENE_46&lt;/luceneMatchVersion&gt;
+</code></pre>
+<pre><code data-trim>
+    &lt;dataDir&gt;${solr.data.dir:}&lt;/dataDir&gt;
+</code></pre>
+<pre><code data-trim>
+    &lt;directoryFactory name="DirectoryFactory"
+        class="${solr.directoryFactory:solr.StandardDirectoryFactory}"/&gt;
+</code></pre>
             </section>
         </section>
 
