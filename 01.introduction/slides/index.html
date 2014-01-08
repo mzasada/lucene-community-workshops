@@ -34,8 +34,13 @@
         <section>
             <h1>Agenda</h1>
             <ul>
-                <li>Indexing</li>
-                <li>Searching</li>
+                <li>Basic concepts
+                    <ul>
+                        <li>Indexing</li>
+                        <li>Searching</li>
+                    </ul>
+                </li>
+                <li>Schema</li>
                 <li>Q & A</li>
             </ul>
         </section>
@@ -48,8 +53,8 @@
 
         <section>
             <section>
-                <h2>Indexing</h2>
-                <h4>Lucene indexing API</h4>
+                <h2>Lucene indexing</h2>
+                <h4>Indexing API</h4>
 <pre><code data-trim>
     class Indexer implements Closeable {
 
@@ -68,7 +73,7 @@
             </section>
 
             <section>
-                <h2>Indexing</h2>
+                <h2>Lucene indexing</h2>
                 <h4>Document preparation</h4>
 <pre><code data-trim>
     private Document prepareDocument(Map&lt;String, Object&gt; fields) {
@@ -85,7 +90,7 @@
             </section>
 
             <section>
-                <h2>Indexing</h2>
+                <h2>Lucene indexing</h2>
                 <h4>Adding document into index</h4>
 <pre><code data-trim>
     void index(Map&lt;String, Object&gt; fields) {
@@ -100,9 +105,118 @@
 
         </section>
 
+        <!-- Solr Indexing -->
+
+        <section>
             <section>
-                <h1>Q & A</h1>
+                <h2>Solr request handling</h2>
+                <h4>Dispatcher</h4>
+                <img src="img/solr/indexing/SolrDispatchFilter.svg" alt="Solr request handling"/>
             </section>
+
+            <section>
+                <h2>Solr request handling</h2>
+                <h4>web.xml</h4>
+<pre><code data-trim>
+&lt;filter&gt;
+    &lt;filter-name&gt;SolrRequestFilter&lt;/filter-name&gt;
+    &lt;filter-class&gt;org.apache.solr.servlet.SolrDispatchFilter&lt;/filter-class&gt;
+&lt;/filter&gt;
+&lt;filter-mapping&gt;
+    &lt;filter-name&gt;SolrRequestFilter&lt;/filter-name&gt;
+    &lt;url-pattern&gt;/*&lt;/url-pattern&gt;
+&lt;/filter-mapping&gt;
+</code></pre>
+            </section>
+        </section>
+
+        <section>
+            <section>
+                <h2>Solr request handling</h2>
+                <h4>Handler lookup</h4>
+                <img src="img/solr/indexing/SolrRequestHandler.svg" alt="Handler lookup"/>
+            </section>
+            <section>
+                <h2>Solr request handling</h2>
+                <h4>solrconfig.xml</h4>
+<pre><code data-trim>
+&lt;requestHandler name="/update" class="solr.UpdateRequestHandler"/&gt;
+</code></pre>
+<pre><code data-trim>
+&lt;requestHandler name="/select" class="solr.SearchHandler"&gt;
+    &lt;lst name="defaults"&gt;
+        &lt;str name="echoParams"&gt;explicit&lt;/str&gt;
+        &lt;int name="rows"&gt;10&lt;/int&gt;
+        &lt;str name="df"&gt;code&lt;/str&gt;
+    &lt;/lst&gt;
+&lt;/requestHandler&gt;
+</code></pre>
+            </section>
+        </section>
+
+        <section>
+            <h2>Solr indexing</h2>
+            <h4>Document preparation</h4>
+<pre><code data-trim>
+    Map&lt;String,ContentStreamLoader&gt; registry = new HashMap&lt;String,ContentStreamLoader&gt;();
+    registry.put("application/xml", new XMLLoader().init(p) );
+    registry.put("application/json", new JsonLoader().init(p) );
+    registry.put("application/csv", new CSVLoader().init(p) );
+    registry.put("application/javabin", new JavabinLoader().init(p) );
+    registry.put("text/csv", registry.get("application/csv") );
+    registry.put("text/xml", registry.get("application/xml") );
+    registry.put("text/json", registry.get("application/json") );
+</code></pre>
+        </section>
+
+        <section>
+            <section>
+                <h2>Solr indexing</h2>
+                <h4>Update processing</h4>
+                <img src="img/solr/indexing/UpdateHandler.svg" alt="Handler lookup"/>
+            </section>
+
+            <section>
+                <h2>Solr indexing</h2>
+                <h4>solrconfig.xml</h4>
+<pre><code data-trim>
+    &lt;updateRequestProcessorChain name="mychain" default="true"&gt;
+        &lt;processor class="solr.CustomUpdateRequestProcessorFactory"&gt;
+            &lt;lst name="name"&gt;
+                &lt;str name="n1"&gt;x1&lt;/str&gt;
+                &lt;str name="n2"&gt;x2&lt;/str&gt;
+            &lt;/lst&gt;
+        &lt;/processor&gt;
+        &lt;processor class="solr.LogUpdateProcessorFactory" /&gt;
+        &lt;processor class="solr.RunUpdateProcessorFactory" /&gt;
+    &lt;/updateRequestProcessorChain&gt;
+</code></pre>
+            </section>
+
+            <section>
+                <h2>Solr indexing</h2>
+                <h4>solrconfig.xml</h4>
+<pre><code data-trim>
+&lt;updateHandler class="solr.DirectUpdateHandler2"&gt;
+    &lt;updateLog&gt;
+        &lt;str name="dir"&gt;${solr.ulog.dir:}&lt;/str&gt;
+    &lt;/updateLog&gt;
+    &lt;autoCommit&gt;
+        &lt;maxTime&gt;15000&lt;/maxTime&gt;
+        &lt;openSearcher&gt;false&lt;/openSearcher&gt;
+    &lt;/autoCommit&gt;
+&lt;/updateHandler&gt;
+</code></pre>
+            </section>
+
+            <section>
+
+            </section>
+        </section>
+
+        <section>
+            <h1>Q & A</h1>
+        </section>
 
     </div>
 </div>
