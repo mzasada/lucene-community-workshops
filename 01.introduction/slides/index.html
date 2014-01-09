@@ -210,16 +210,10 @@
                 <h2>Solr request handling</h2>
                 <h4>solrconfig.xml</h4>
 <pre><code data-trim>
-&lt;requestHandler name="/update" class="solr.UpdateRequestHandler"/&gt;
+&lt;requestHandler name="/update" class="solr.UpdateRequestHandler" /&gt;
 </code></pre>
 <pre><code data-trim>
-&lt;requestHandler name="/select" class="solr.SearchHandler"&gt;
-    &lt;lst name="defaults"&gt;
-        &lt;str name="echoParams"&gt;explicit&lt;/str&gt;
-        &lt;int name="rows"&gt;10&lt;/int&gt;
-        &lt;str name="df"&gt;code&lt;/str&gt;
-    &lt;/lst&gt;
-&lt;/requestHandler&gt;
+&lt;requestHandler name="/select" class="solr.SearchHandler" /&gt;
 </code></pre>
             </section>
         </section>
@@ -233,6 +227,9 @@
         <section>
             <h2>Solr indexing</h2>
             <h4>Document preparation</h4>
+<pre><code data-trim>
+    &lt;requestHandler name="/update" class="solr.UpdateRequestHandler" /&gt;
+</code></pre>
 <pre><code data-trim>
     Map&lt;String,ContentStreamLoader&gt; registry = new HashMap&lt;String,ContentStreamLoader&gt;();
     registry.put("application/xml", new XMLLoader().init(p) );
@@ -279,8 +276,8 @@
     &lt;/updateLog&gt;
     &lt;autoCommit&gt;
         &lt;maxTime&gt;15000&lt;/maxTime&gt;
-        &lt;openSearcher&gt;false&lt;/openSearcher&gt;
     &lt;/autoCommit&gt;
+    (...)
 &lt;/updateHandler&gt;
 </code></pre>
             </section>
