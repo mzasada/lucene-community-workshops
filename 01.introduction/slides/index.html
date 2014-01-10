@@ -169,6 +169,33 @@
 
         </section>
 
+        <section>
+            <h2>Lucene indexing + searching</h2>
+<pre><code data-trim>
+    given:
+    def indexer = new Indexer(indexLocation)
+
+    indexer.index([
+        (SchemaConstants.FIELD_NAME_CONTENT): "The quick brown fox jumps over the lazy dog",
+        (SchemaConstants.FIELD_NAME_ID): "DOC_1"])
+    indexer.index([
+        (SchemaConstants.FIELD_NAME_CONTENT): "Lucene in action!",
+        (SchemaConstants.FIELD_NAME_ID): "DOC_2"])
+
+    def searcher = new Searcher(indexLocation)
+</code></pre>
+<pre><code data-trim>
+    when:
+    def hits = searcher.search("+quick")
+</code></pre>
+<pre><code data-trim>
+    then:
+    indexer.countIndexedDocuments() == 2
+    hits.size() == 1
+    hits[0].get(SchemaConstants.FIELD_NAME_ID) == "DOC_1"
+</code></pre>
+        </section>
+
         <!-- Solr request handling -->
 
         <section>
