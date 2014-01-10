@@ -32,7 +32,7 @@ class Searcher {
         def start = currentTimeMillis()
         TopDocs hits = indexSearcher.search(query, 10)
         def duration = currentTimeMillis() - start
-        println("Found $hits.totalHits document(s) in $duration ms for query $phrase")
+        println("Found $hits.totalHits document(s) in $duration ms for query [$phrase]")
 
         hits.scoreDocs.collect { indexSearcher.doc(it.doc) }
     }
